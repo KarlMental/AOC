@@ -31,7 +31,8 @@ print(len(visited))
 
 groups = []
 for key in relations.keys():
-	visited = sorted(creep_creep(relations, key, []))
-	if visited not in groups:
-		groups.append(visited)
+	if key not in [item for sublist in groups for item in sublist]:
+		visited = sorted(creep_creep(relations, key, []))
+		if visited not in groups:
+			groups.append(visited)
 print(len(groups))
