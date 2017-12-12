@@ -23,17 +23,15 @@ def creep_creep(relations_dict, key, visited):
 		visited.append(key)
 		for relation in relations_dict[key]:
 			if relation not in visited:
-				creep_creep(relations_dict, relation, visited)
+				visited = creep_creep(relations_dict, relation, visited)
+	return visited
 
-visited = []
-creep_creep(relations, '0', visited)
+visited = creep_creep(relations, '0', [])
 print(len(visited))
 
 groups = []
 for key in relations.keys():
-	visited = []
-	creep_creep(relations, key, visited)
-	visited = sorted(visited)
+	visited = sorted(creep_creep(relations, key, []))
 	if visited not in groups:
 		groups.append(visited)
 print(len(groups))
