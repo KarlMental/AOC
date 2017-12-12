@@ -18,25 +18,21 @@ for instruction in instructions:
 		if instruction[0] not in relations[relation]:
 			relations[relation].append(instruction[0])
 
-def creep_creep(relations_dict, key, visited, count):
+def creep_creep(relations_dict, key, visited):
 	if relations_dict[key]:
 		visited.append(key)
 		for relation in relations_dict[key]:
 			if relation not in visited:
-				count += 1
-				creep_creep(relations_dict, relation, visited, count)
+				creep_creep(relations_dict, relation, visited)
 
-
-count = 0
 visited = []
-creep_creep(relations, '0', visited, count)
+creep_creep(relations, '0', visited)
 print(len(visited))
 
 groups = []
 for key in relations.keys():
-	count = 0
 	visited = []
-	creep_creep(relations, key, visited, count)
+	creep_creep(relations, key, visited)
 	visited = sorted(visited)
 	if visited not in groups:
 		groups.append(visited)
