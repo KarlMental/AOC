@@ -25,13 +25,11 @@ delay = 0
 while True:
 	cont = False
 	for i, layer_value in enumerate(layers):
-		if give_hit_at_iteration(layer_value, i+delay):
+		if give_hit_at_iteration(layer_value, i+delay) and layer_value > 0:
 			cont = True
 			break
 	if not cont:
 		break
 	delay += 1
-	if delay%100000 == 0:
-		print(delay, cont)
 	
 print(delay)
