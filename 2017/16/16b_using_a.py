@@ -1,7 +1,3 @@
-with open('i', 'r') as f:
-    inp = f.read().split(',')
-
-line = 'abcdefghijklmnop'
 def run_instruction(instruction, line):
 	line = [char for char in line]
 	if instruction[0] == 's':
@@ -28,6 +24,12 @@ def partner(instruction, line):
 	index_inst = str(line.index(instruction[0])) + '/' + str(line.index(instruction[1]))
 	line = exchange(index_inst, line)
 	return ''.join(line)
+
+with open('i', 'r') as f:
+    inp = f.read().split(',')
+
+line = 'abcdefghijklmnop'
+
 original_line = line
 
 for dance in range(10**9):
@@ -40,4 +42,5 @@ for dance in range(10**9):
 for dance in range(10**9%repetition_index):
 	for instruction in inp:
 		line = run_instruction(instruction, line)
+
 print(line)

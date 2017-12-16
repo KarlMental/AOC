@@ -1,7 +1,3 @@
-with open('i', 'r') as f:
-    inp = f.read().split(',')
-
-line = 'abcdefghijklmnop'
 def run_instruction(instruction, line):
 	line = [char for char in line]
 	if instruction[0] == 's':
@@ -29,6 +25,12 @@ def partner(instruction, line):
 	line = exchange(index_inst, line)
 	return ''.join(line)
 
+with open('i', 'r') as f:
+    inp = f.read().split(',')
+
+line = 'abcdefghijklmnop'
+
 for instruction in inp:
 	line = run_instruction(instruction, line)
+
 print(line)

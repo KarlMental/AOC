@@ -1,6 +1,3 @@
-import sys
-from tqdm import tqdm
-
 with open('i', 'r') as f:
     inp = f.read().split(',')
 
