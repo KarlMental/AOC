@@ -6,7 +6,10 @@ def parse(variables, instruction):
         try:
             instruction[2] = int(instruction[2])
         except:
-            pass
+            try:
+                instruction[1] = int(instruction[1])
+            except:
+                pass
     return instruction
 
 def set(variables, var, val):
@@ -36,7 +39,10 @@ def jgz(variables, var, val):
         return 1
 
 def snd(variables, var):
-    return variables[var]
+    if var in variables.keys():
+        return variables[var]
+    else:
+        return var
 
 def start_program(this_program, other_program, this_variables, other_variables, this_queue, other_queue, this_iter, other_iter, inp, counter):
     while this_iter < len(inp):
@@ -74,13 +80,13 @@ def start_program(this_program, other_program, this_variables, other_variables, 
             except KeyError:
                 pass            
         elif instruction[0] == 'rcv':
-            print(len(other_queue))
             if not other_queue:
                 if not this_queue:
                     return this_program, other_program, this_variables, other_variables, this_queue, other_queue, this_iter, other_iter, inp, counter
                 else:
-                    this_program, other_program, this_variables, other_variables, this_queue, other_queue, this_iter, other_iter, inp, counter, trying = start_program(other_program, this_program, other_variables, this_variables, other_queue, this_queue, other_iter, this_iter, inp, counter)
-
+                    this_program, other_program, this_variables, other_variables, this_queue, other_queue, this_iter, other_iter, inp, counter = start_program(other_program, this_program, other_variables, this_variables, other_queue, this_queue, other_iter, this_iter, inp, counter)
+                if not this_queue:
+                    return this_program, other_program, this_variables, other_variables, this_queue, other_queue, this_iter, other_iter, inp, counter
             try:
                 this_variables = rcv(this_variables, instruction[1], other_queue.pop(0))
             except KeyError:
@@ -88,7 +94,7 @@ def start_program(this_program, other_program, this_variables, other_variables, 
         this_iter += 1
 
 
-with open('i', 'r') as f:
+with open('i.test', 'r') as f:
     inp = f.read().split('\n')
 
 print(start_program('A', 'B', {'p': 0}, {'p': 1}, [], [], 0, 0, inp, 0))
