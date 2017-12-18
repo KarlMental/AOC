@@ -38,92 +38,57 @@ def jgz(variables, var, val):
 def snd(variables, var):
     return variables[var]
 
+def start_program(this_program, other_program, this_variables, other_variables, this_queue, other_queue, this_iter, other_iter, inp, counter):
+    while this_iter < len(inp):
+        instruction = parse(this_variables, inp[this_iter])
+        if instruction[0] == 'jgz':
+            try:
+                this_iter += jgz(this_variables, instruction[1], instruction[2]) - 1
+            except KeyError:
+                pass
+        elif instruction[0] == 'set':
+            try:
+                this_variables = set(this_variables, instruction[1], instruction[2])
+            except this_variables:
+                pass
+        elif instruction[0] == 'mul':
+            try:
+                this_variables = mul(this_variables, instruction[1], instruction[2])
+            except KeyError:
+                pass
+        elif instruction[0] == 'add':
+            try:
+                this_variables = add(this_variables, instruction[1], instruction[2])
+            except KeyError:
+                pass            
+        elif instruction[0] == 'mod':
+            try:
+                this_variables = mod(this_variables, instruction[1], instruction[2])
+            except KeyError:
+                pass            
+        elif instruction[0] == 'snd':
+            try: 
+                this_queue.append(snd(this_variables, instruction[1]))
+                if this_program == 'B':
+                    counter += 1
+            except KeyError:
+                pass            
+        elif instruction[0] == 'rcv':
+            print(len(other_queue))
+            if not other_queue:
+                if not this_queue:
+                    return this_program, other_program, this_variables, other_variables, this_queue, other_queue, this_iter, other_iter, inp, counter
+                else:
+                    this_program, other_program, this_variables, other_variables, this_queue, other_queue, this_iter, other_iter, inp, counter, trying = start_program(other_program, this_program, other_variables, this_variables, other_queue, this_queue, other_iter, this_iter, inp, counter)
+
+            try:
+                this_variables = rcv(this_variables, instruction[1], other_queue.pop(0))
+            except KeyError:
+                pass
+        this_iter += 1
+
+
 with open('i', 'r') as f:
     inp = f.read().split('\n')
 
-
-variables_A = {'p': 0}
-variables_B = {'p': 1}
-
-A_queue = []
-B_queue = []
-i = 0
-
-while i < len(inp):
-    instruction = parse(variables_A, inp[i])
-    if instruction[0] == 'jgz':
-        try:
-            i += jgz(variables_A, instruction[1], instruction[2]) - 1
-        except KeyError:
-            pass
-    elif instruction[0] == 'set':
-        try:
-            variables_A = set(variables_A, instruction[1], instruction[2])
-        except KeyError:
-            pass
-    elif instruction[0] == 'mul':
-        try:
-            variables_A = mul(variables_A, instruction[1], instruction[2])
-        except KeyError:
-            pass
-    elif instruction[0] == 'add':
-        try:
-            variables_A = add(variables_A, instruction[1], instruction[2])
-        except KeyError:
-            pass            
-    elif instruction[0] == 'mod':
-        try:
-            variables_A = mod(variables_A, instruction[1], instruction[2])
-        except KeyError:
-            pass            
-    elif instruction[0] == 'snd':
-        try: 
-            A_queue.append(snd(variables_A, instruction[1]))
-        except KeyError:
-            pass            
-    elif instruction[0] == 'rcv':
-        break
-    i += 1
-print(A_queue)
-i = 0
-while i < len(inp):
-    instruction = parse(variables_B, inp[i])
-    if instruction[0] == 'jgz':
-        try:
-            i += jgz(variables_B, instruction[1], instruction[2]) - 1
-        except KeyError:
-            pass
-    elif instruction[0] == 'set':
-        try:
-            variables_B = set(variables_B, instruction[1], instruction[2])
-        except KeyError:
-            pass
-    elif instruction[0] == 'mul':
-        try:
-            variables_B = mul(variables_B, instruction[1], instruction[2])
-        except KeyError:
-            pass
-    elif instruction[0] == 'add':
-        try:
-            variables_B = add(variables_B, instruction[1], instruction[2])
-        except KeyError:
-            pass            
-    elif instruction[0] == 'mod':
-        try:
-            variables_B = mod(variables_B, instruction[1], instruction[2])
-        except KeyError:
-            pass            
-    elif instruction[0] == 'snd':
-        try: 
-            B_queue.append(snd(variables_B, instruction[1]))
-        except KeyError:
-            pass            
-    elif instruction[0] == 'rcv':
-        try:
-            variables_B = rcv(variables_B, instruction[1], A_queue.pop(0))
-        except KeyError:
-            pass
-        except IndexError:
-            print(len(B_queue)) 
-            break        
-    i += 1
+print(start_program('A', 'B', {'p': 0}, {'p': 1}, [], [], 0, 0, inp, 0))
