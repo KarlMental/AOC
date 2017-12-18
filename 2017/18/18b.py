@@ -28,10 +28,6 @@ def mod(variables, var, val):
     variables[var] = variables[var] % val
     return variables
 
-def rcv(variables, var, val):
-    variables[var] = val
-    return variables
-
 def jgz(variables, var, val):
     if variables[var] > 0:
         return val
@@ -44,9 +40,10 @@ def snd(variables, var):
     else:
         return var
 
-def start_program(this_program, other_program, this_variables, other_variables, this_queue, other_queue, this_iter, other_iter, inp, counter):
+def start_program(this_program, other_program, this_variables, other_variables, this_queue, other_queue, this_iter, other_iter, inp, counter, first_question=False):
     while this_iter < len(inp):
         instruction = parse(this_variables, inp[this_iter])
+        print(len(this_queue), len(other_queue))
         if instruction[0] == 'jgz':
             try:
                 this_iter += jgz(this_variables, instruction[1], instruction[2]) - 1
@@ -80,21 +77,22 @@ def start_program(this_program, other_program, this_variables, other_variables, 
             except KeyError:
                 pass            
         elif instruction[0] == 'rcv':
+            if first_question is True:
+                return this_queue[-1]
             if not other_queue:
                 if not this_queue:
                     return this_program, other_program, this_variables, other_variables, this_queue, other_queue, this_iter, other_iter, inp, counter
                 else:
-                    this_program, other_program, this_variables, other_variables, this_queue, other_queue, this_iter, other_iter, inp, counter = start_program(other_program, this_program, other_variables, this_variables, other_queue, this_queue, other_iter, this_iter, inp, counter)
-                if not this_queue:
-                    return this_program, other_program, this_variables, other_variables, this_queue, other_queue, this_iter, other_iter, inp, counter
+                    other_program, this_program, other_variables, this_variables, other_queue, this_queue, other_iter, this_iter, inp, counter = start_program(other_program, this_program, other_variables, this_variables, other_queue, this_queue, other_iter, this_iter, inp, counter)
+                    continue
             try:
-                this_variables = rcv(this_variables, instruction[1], other_queue.pop(0))
+                this_variables = set(this_variables, instruction[1], other_queue.pop(0))
             except KeyError:
                 pass
         this_iter += 1
 
-
-with open('i.test', 'r') as f:
+with open('i', 'r') as f:
     inp = f.read().split('\n')
 
+print(start_program('A', 'B', {}, {}, [], [], 0, 0, inp, 0, True))
 print(start_program('A', 'B', {'p': 0}, {'p': 1}, [], [], 0, 0, inp, 0))
