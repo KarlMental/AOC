@@ -40,59 +40,62 @@ def snd(variables, var):
     else:
         return var
 
-def start_program(this_program, other_program, this_variables, other_variables, this_queue, other_queue, this_iter, other_iter, inp, counter, first_question=False):
-    while this_iter < len(inp):
-        instruction = parse(this_variables, inp[this_iter])
-        print(len(this_queue), len(other_queue))
+def start_program(program1, program2, inp, first_question=False):
+    while program1['step'] < len(inp):
+        instruction = parse(program1['variables'], inp[program1['step']])
+        print(len(program1['queue']), len(program2['queue']))
         if instruction[0] == 'jgz':
             try:
-                this_iter += jgz(this_variables, instruction[1], instruction[2]) - 1
+                program1['step'] += jgz(program1['variables'], instruction[1], instruction[2]) - 1
             except KeyError:
                 pass
         elif instruction[0] == 'set':
             try:
-                this_variables = set(this_variables, instruction[1], instruction[2])
+                program1['variables'] = set(program1['variables'], instruction[1], instruction[2])
             except this_variables:
                 pass
         elif instruction[0] == 'mul':
             try:
-                this_variables = mul(this_variables, instruction[1], instruction[2])
+                program1['variables'] = mul(program1['variables'], instruction[1], instruction[2])
             except KeyError:
                 pass
         elif instruction[0] == 'add':
             try:
-                this_variables = add(this_variables, instruction[1], instruction[2])
+                program1['variables'] = add(program1['variables'], instruction[1], instruction[2])
             except KeyError:
                 pass            
         elif instruction[0] == 'mod':
             try:
-                this_variables = mod(this_variables, instruction[1], instruction[2])
+                program1['variables'] = mod(program1['variables'], instruction[1], instruction[2])
             except KeyError:
                 pass            
         elif instruction[0] == 'snd':
             try: 
-                this_queue.append(snd(this_variables, instruction[1]))
-                if this_program == 'B':
-                    counter += 1
+                program1['queue'].append(snd(program1['variables'], instruction[1]))
+                if program1['name'] == 'B':
+                    program1['counter'] += 1
             except KeyError:
                 pass            
         elif instruction[0] == 'rcv':
             if first_question is True:
-                return this_queue[-1]
-            if not other_queue:
-                if not this_queue:
-                    return this_program, other_program, this_variables, other_variables, this_queue, other_queue, this_iter, other_iter, inp, counter
+                return program1['queue']
+            if not program2['queue']:
+                if not program1['queue']:
+                    return program1['queue']
                 else:
-                    other_program, this_program, other_variables, this_variables, other_queue, this_queue, other_iter, this_iter, inp, counter = start_program(other_program, this_program, other_variables, this_variables, other_queue, this_queue, other_iter, this_iter, inp, counter)
+                    program2, program1 = start_program(program2, program1, inp), program2
                     continue
             try:
-                this_variables = set(this_variables, instruction[1], other_queue.pop(0))
+                program1['variables'] = set(program1['variables'], instruction[1], program2['queue'].pop(0))
             except KeyError:
                 pass
-        this_iter += 1
+        program1['step'] += 1
 
 with open('i', 'r') as f:
     inp = f.read().split('\n')
 
-print(start_program('A', 'B', {}, {}, [], [], 0, 0, inp, 0, True))
-print(start_program('A', 'B', {'p': 0}, {'p': 1}, [], [], 0, 0, inp, 0))
+program_A = {'name': 'A', 'variables': {}, 'queue': [], 'step': 0, 'counter': 0}
+program_B = {'name': 'B', 'variables': {}, 'queue': [], 'step': 0, 'counter': 0}
+
+print(start_program(program_A, program_B, inp, True))
+print(start_program(program_A, program_B, inp))
