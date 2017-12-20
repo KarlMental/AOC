@@ -1,20 +1,7 @@
 import re
 import itertools
 
-with open('i', 'r') as f:
-    inp = f.read().strip().split('\n')
-data = [re.findall(r'<(.*?)>',row) for row in inp]
-
-particles = []
-
-for row in data:
-    new_row = []
-    for prop in row:
-        new_row.append([int(x) for x in prop.split(',')])
-    particles.append(new_row)
-
 def create_iter_particle(particle):
-
     def func(i):
         x = particle[0][0] + particle[1][0]*i + particle[2][0]*i*(i+1)/2
         y = particle[0][1] + particle[1][1]*i + particle[2][1]*i*(i+1)/2
@@ -22,24 +9,48 @@ def create_iter_particle(particle):
         return [int(x), int(y), int(z)]
     return func
 
-function_list = []
+def functify_particle_list(particles):
+    particle_functions = []
 
-for particle in particles:
-    function_list.append(create_iter_particle(particle))
+    for particle in particles:
+        particle_functions.append(create_iter_particle(particle))
+    return particle_functions
 
-for i in itertools.count():
-    print(len(function_list))
-    values = []
-    not_index = []
-    for particle in function_list:
-        values.append(particle(i))
-    for j, value in enumerate(values):
-        if values.count(value) > 1:
-            not_index.append(j)
+def remove_collisions(particles, iteration):
+    values = [particle(iteration) for particle in particles]
+
     new_func = []
-    for j, particle in enumerate(function_list):
-        if j not in not_index:
-            new_func.append(particle)
-    function_list = new_func
-    
+    for j, value in enumerate(values):
+        if values.count(value) < 2:
+            new_func.append(particles[j])
+    return new_func
+
+def get_input_data():
+    with open('i', 'r') as f:
+        inp = f.read().strip().split('\n')
+
+    return [re.findall(r'<(.*?)>',row) for row in inp]
+
+def main():
+    particles = functify_particle_list(
+        [[[int(x) for x in prop.split(',')] for prop in row] for row in get_input_data()]
+        )
+
+    consecutives = 0
+    for i in itertools.count():
+
+        particles = remove_collisions(particles, i)
+        
+        length = len(particles)
+        if len(particles) == length:
+            consecutives += 1
+            if consecutives > 20:
+                break
+        else:
+            consecutives = 0
+        
+    print(len(particles))
+
+if __name__ == '__main__':
+    main()
 
