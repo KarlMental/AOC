@@ -8,16 +8,12 @@ def remove_collisions(particles):
             new_particles.append(particle)
     return new_particles
 
-def update_positions(particles):
-    new_particles = []
-    for particle in particles:
-        new_particle = []
-        new_particle.append(list(map(add, particle[0], particle[1])))
-        new_particle.append(list(map(add, particle[1], particle[2])))
-        new_particle.append(particle[2])
-        new_particles.append(new_particle)
-    return new_particles
-
+def update_positions_mut(particles):
+    for i, particle in enumerate(particles):
+        v = list(map(add, particle[1], particle[2]))
+        p = list(map(add, particle[0], v))
+        particles[i] = [p, v, particle[2]]
+    return particles
 
 with open('i', 'r') as f:
     inp = f.read().strip().split('\n')
@@ -33,6 +29,5 @@ for row in data:
 
 while True:
     particles = remove_collisions(particles)
-    particles = update_positions(particles)
-
-
+    particles = update_positions_mut(particles)
+    print(len(particles))
