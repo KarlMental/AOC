@@ -10,38 +10,27 @@ def create_iter_particle(particle):
     return func
 
 def functify_particle_list(particles):
-    particle_functions = []
-
-    for particle in particles:
-        particle_functions.append(create_iter_particle(particle))
+    particle_functions = [create_iter_particle(particle) for particle in particles]
     return particle_functions
 
 def remove_collisions(particles, iteration):
     values = [particle(iteration) for particle in particles]
-
-    new_func = []
-    for j, value in enumerate(values):
-        if values.count(value) < 2:
-            new_func.append(particles[j])
+    new_func = [particles[j] for j, value in enumerate(values) if values.count(value) < 2]
     return new_func
 
 def get_input_data():
     with open('i', 'r') as f:
         inp = f.read().strip().split('\n')
-
     return [re.findall(r'<(.*?)>',row) for row in inp]
 
 def main():
-    particles = functify_particle_list(
-        [[[int(x) for x in prop.split(',')] for prop in row] for row in get_input_data()]
-        )
+    particles = [[[int(x) for x in prop.split(',')] for prop in row] for row in get_input_data()]
+    particles = functify_particle_list(particles)
 
     consecutives = 0
     for i in itertools.count():
-
-        particles = remove_collisions(particles, i)
-        
         length = len(particles)
+        particles = remove_collisions(particles, i)
         if len(particles) == length:
             consecutives += 1
             if consecutives > 20:
@@ -53,4 +42,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
